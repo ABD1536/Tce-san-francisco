@@ -49,13 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 3. Enterprise Contact Form Flows (Exact match to tce-contact-enterprise.html)
+  // 3. Enterprise Contact Form Flows
   const baseFields = [
-    ["Full name", "text", "Jane Smith"],
-    ["Email", "email", "jane@company.com"],
-    ["Organization", "text", "Company, publication, or creator name"],
-    ["Location", "text", "City, country"],
-    ["Message", "textarea", "Briefly tell us what you need.", "full"]
+    ["Full name", "text", "Jane Smith", "half", true],
+    ["Email", "email", "jane@company.com", "half", true],
+    ["Organization", "text", "Company, publication, or creator name", "half", true],
+    ["Location", "text", "City, country", "half", false],
+    ["Message", "textarea", "Briefly tell us what you need.", "full", false]
   ];
 
   const flows = {
@@ -64,9 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
       submit: "Get a Custom Proposal",
       section: "Campaign details",
       fields: [
-        ["Campaign budget", "select", ["Select budget", "$25k-$50k", "$50k-$100k", "$100k-$250k", "$250k+"]],
-        ["Target markets", "text", "US, UAE, UK, India..."],
-        ["Timeline", "select", ["Select timeline", "ASAP", "30 days", "This quarter", "Planning ahead"]]
+        ["Campaign budget", "select", ["Select budget", "$10k-$25k", "$25k-$50k", "$50k-$100k", "$100k+"], "half", true],
+        ["Target markets", "text", "US, UAE, UK, India...", "half", false],
+        ["Timeline", "select", ["Select timeline", "ASAP", "30 days", "This quarter", "Planning ahead"], "full", false]
       ]
     },
     creator: {
@@ -74,9 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
       submit: "Submit Creator Profile",
       section: "Creator details",
       fields: [
-        ["Primary platform", "select", ["Select platform", "TikTok", "Instagram", "YouTube", "LinkedIn", "Other"]],
-        ["Profile link", "url", "https://instagram.com/..."],
-        ["Audience size", "select", ["Select audience size", "10k-50k", "50k-250k", "250k-1M", "1M+"]]
+        ["Primary platform", "select", ["Select platform", "TikTok", "Instagram", "YouTube", "LinkedIn", "Other"], "half", true],
+        ["Profile link", "url", "https://instagram.com/...", "half", true],
+        ["Audience size", "select", ["Select audience size", "10k-50k", "50k-250k", "250k-1M", "1M+"], "full", false]
       ]
     },
     partner: {
@@ -84,9 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
       submit: "Start Conversation",
       section: "Partnership details",
       fields: [
-        ["Partnership type", "select", ["Select type", "Platform", "Agency", "Technology", "Media", "Investor", "Other"]],
-        ["Markets", "text", "Relevant markets"],
-        ["Timeline", "select", ["Select timeline", "This month", "This quarter", "Exploratory"]]
+        ["Partnership type", "select", ["Select type", "Platform", "Agency", "Technology", "Media", "Investor", "Other"], "half", true],
+        ["Markets", "text", "Relevant markets", "half", false],
+        ["Timeline", "select", ["Select timeline", "This month", "This quarter", "Exploratory"], "full", false]
       ]
     },
     media: {
@@ -94,8 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
       submit: "Send Media Inquiry",
       section: "Media details",
       fields: [
-        ["Deadline", "text", "When do you need a response?"],
-        ["Format", "select", ["Select format", "Interview", "Commentary", "Podcast", "Speaking", "Press request"]]
+        ["Deadline", "text", "When do you need a response?", "half", false],
+        ["Format", "select", ["Select format", "Interview", "Commentary", "Podcast", "Speaking", "Press request"], "half", false]
       ]
     },
     careers: {
@@ -103,8 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
       submit: "Submit Interest",
       section: "Career details",
       fields: [
-        ["Area of interest", "select", ["Select area", "Sales", "Campaign strategy", "Creator success", "Operations", "Data and AI", "Other"]],
-        ["LinkedIn", "url", "https://linkedin.com/in/..."]
+        ["Area of interest", "select", ["Select area", "Sales", "Campaign strategy", "Creator success", "Operations", "Data and AI", "Other"], "half", true],
+        ["LinkedIn", "url", "https://linkedin.com/in/...", "half", false]
       ]
     }
   };
@@ -117,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderFlow(flowName) {
     if (!fieldsContainer || !formTitle || !submitBtn) return;
     const flow = flows[flowName];
+    if (!flow) return;
     formTitle.textContent = flow.title;
     submitBtn.textContent = flow.submit;
     fieldsContainer.innerHTML = "";
@@ -131,14 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const [labelText, type, placeholder, size] = item;
+      const [labelText, type, placeholder, size, isRequired] = item;
       const fieldCell = document.createElement("div");
       fieldCell.className = size === "full" ? "f-cell full" : "f-cell";
 
       const id = labelText.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       const label = document.createElement("label");
       label.setAttribute("for", id);
-      label.textContent = labelText;
+      label.textContent = labelText + (isRequired ? " *" : "");
 
       let control;
       if (type === "select") {
@@ -160,21 +161,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
       control.id = id;
       control.name = id;
+      if (isRequired) {
+        control.required = true;
+      }
+
       fieldCell.append(label, control);
       fieldsContainer.appendChild(fieldCell);
     });
   }
 
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      tabs.forEach((t) => t.classList.remove("active"));
-      tab.classList.add("active");
-      renderFlow(tab.dataset.flow);
+  if (tabs.length > 0) {
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        renderFlow(tab.dataset.flow);
+      });
     });
-  });
+  }
 
   const enterpriseForm = document.querySelector("#enterpriseForm");
-  const freePlanForm = document.querySelector("#freePlanForm");
   const newsletterForm = document.querySelector("#newsletterForm");
   const successModal = document.querySelector("#successModal");
   const closeModalBtn = document.querySelector("#closeModalBtn");
@@ -182,28 +188,46 @@ document.addEventListener('DOMContentLoaded', () => {
   if (enterpriseForm) {
     enterpriseForm.addEventListener("submit", (e) => {
       e.preventDefault();
+
+      // Reset custom validity error messages
+      const inputs = enterpriseForm.querySelectorAll("input, select, textarea");
+      inputs.forEach(input => input.setCustomValidity(""));
+
+      // HTML5 Required check
+      if (!enterpriseForm.checkValidity()) {
+        enterpriseForm.reportValidity();
+        return;
+      }
+
+      // Email Format Regex Check
+      const emailInput = enterpriseForm.querySelector('input[type="email"]');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailInput && !emailRegex.test(emailInput.value.trim())) {
+        emailInput.setCustomValidity("Please enter a valid email address.");
+        emailInput.reportValidity();
+        return;
+      }
+
+      // Show success modal ONLY on valid submission
       if (successModal) {
         successModal.classList.add("active");
       }
       const activeFlow = document.querySelector(".tab-btn.active")?.dataset.flow || "brand";
-      submitBtn.textContent = "Request Received";
-      setTimeout(() => renderFlow(activeFlow), 2000);
-    });
-  }
-
-  if (freePlanForm) {
-    freePlanForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (successModal) {
-        successModal.classList.add("active");
-      }
-      freePlanForm.reset();
+      if (submitBtn) submitBtn.textContent = "Request Received";
+      setTimeout(() => renderFlow(activeFlow), 2500);
     });
   }
 
   if (newsletterForm) {
     newsletterForm.addEventListener("submit", (e) => {
       e.preventDefault();
+      const emailInput = newsletterForm.querySelector('input[type="email"]');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailInput && !emailRegex.test(emailInput.value.trim())) {
+        emailInput.setCustomValidity("Please enter a valid email address.");
+        emailInput.reportValidity();
+        return;
+      }
       alert("Thank you for subscribing to our creator economy briefing!");
       newsletterForm.reset();
     });
@@ -241,19 +265,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 5. FAQ Accordion Toggle
-  const faqRows = document.querySelectorAll(".faq-white-row");
-  faqRows.forEach(row => {
-    const btn = row.querySelector(".faq-btn-white");
-    if (btn) {
-      btn.addEventListener("click", () => {
-        const isActive = row.classList.contains("active");
-        faqRows.forEach(r => r.classList.remove("active"));
-        if (!isActive) {
-          row.classList.add("active");
-        }
-      });
+  window.toggleFaqRef = function(btn) {
+    const card = btn.closest('.faq-ref-card');
+    if (!card) return;
+    const isOpen = card.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    const icon = btn.querySelector('.faq-ref-badge i');
+    if (icon) {
+      icon.className = isOpen ? 'fa-solid fa-minus' : 'fa-solid fa-plus';
     }
-  });
+  };
 
   renderFlow("brand");
 

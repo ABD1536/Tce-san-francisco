@@ -478,15 +478,23 @@ nav { flex: 1; }
 }
 .hero-left { display: flex; flex-direction: column; }
 
+.hero-title {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
 .tce-title-red {
   font-family: var(--font-h); font-weight: 900;
   font-size: clamp(4rem, 9vw, 7.5rem); line-height: .9;
   color: var(--red); text-transform: uppercase;
+  display: block;
 }
 .tce-title-white {
   font-family: var(--font-h); font-weight: 900;
   font-size: clamp(2.6rem, 5.5vw, 4.6rem); line-height: .95;
   color: #fff; text-transform: uppercase; margin-bottom: 20px;
+  display: block;
 }
 .pill-eyebrow-red {
   display: inline-block;
@@ -1176,6 +1184,14 @@ nav { flex: 1; }
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+  background: none;
+  border: none;
+  padding: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
 }
 
 .faq-ref-title {
