@@ -1349,12 +1349,17 @@ nav { flex: 1; }
 }
 .f-cell label, .field-cell label {
   display: block; margin-bottom: 7px;
-  font-size: .8rem; font-weight: 700; color: var(--txt-black);
+  font-size: .82rem; font-weight: 700; color: var(--txt-black);
+}
+.req-asterisk {
+  color: #ff0000;
+  font-weight: bold;
+  margin-left: 2px;
 }
 .f-cell input, .f-cell select, .f-cell textarea,
 .field-cell input, .field-cell select, .field-cell textarea {
   width: 100%; padding: 11px 14px; min-height: 46px;
-  border: 1.5px solid var(--border-light); border-radius: var(--r-sm);
+  border: 1.5px solid var(--border-light); border-radius: 8px !important;
   color: var(--txt-black); background: #fff;
   font-family: var(--font-b); font-size: .925rem;
   transition: border-color .2s;
@@ -1362,11 +1367,39 @@ nav { flex: 1; }
 .f-cell textarea, .field-cell textarea { min-height: 108px; resize: vertical; }
 .f-cell input:focus, .f-cell select:focus, .f-cell textarea:focus,
 .field-cell input:focus, .field-cell select:focus, .field-cell textarea:focus {
-  outline: none; border-color: var(--red);
+  outline: none; border-color: #ff0000;
 }
 .form-submit-row {
   display: flex; flex-wrap: wrap; align-items: center;
   gap: 14px; margin-top: 20px;
+}
+#submitBtn, .btn-tce-red {
+  background-color: #ff0000 !important;
+  color: #ffffff !important;
+  border-radius: 999px !important;
+  font-weight: bold !important;
+  padding: 14px 32px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-h);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+}
+#submitBtn:hover, .btn-tce-red:hover {
+  background-color: #cc0000 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 0, 0, 0.4);
+}
+#submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
 }
 .form-note { flex: 1 1 220px; color: var(--txt-muted); font-size: .8rem; line-height: 1.5; }
 

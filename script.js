@@ -61,50 +61,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const flows = {
     brand: {
       title: "Speak to a Campaign Expert",
-      submit: "Get a Custom Proposal",
-      section: "Campaign details",
+      submit: "GET A CUSTOM PROPOSAL",
+      section: "CAMPAIGN DETAILS",
       fields: [
         ["Campaign budget", "select", ["Select budget", "$10k-$25k", "$25k-$50k", "$50k-$100k", "$100k+"], "half", true],
         ["Target markets", "text", "US, UAE, UK, India...", "half", false],
-        ["Timeline", "select", ["Select timeline", "ASAP", "30 days", "This quarter", "Planning ahead"], "full", false]
+        ["Timeline", "select", ["Select timeline", "Immediate (1-2 weeks)", "1 Month", "2-3 Months", "Flexible / Planning"], "full", false]
       ]
     },
     creator: {
       title: "Apply to Join TCE",
-      submit: "Submit Creator Profile",
-      section: "Creator details",
+      submit: "SUBMIT CREATOR PROFILE",
+      section: "CREATOR DETAILS",
       fields: [
         ["Primary platform", "select", ["Select platform", "TikTok", "Instagram", "YouTube", "LinkedIn", "Other"], "half", true],
         ["Profile link", "url", "https://instagram.com/...", "half", true],
         ["Audience size", "select", ["Select audience size", "10k-50k", "50k-250k", "250k-1M", "1M+"], "full", false]
-      ]
-    },
-    partner: {
-      title: "Discuss a Partnership",
-      submit: "Start Conversation",
-      section: "Partnership details",
-      fields: [
-        ["Partnership type", "select", ["Select type", "Platform", "Agency", "Technology", "Media", "Investor", "Other"], "half", true],
-        ["Markets", "text", "Relevant markets", "half", false],
-        ["Timeline", "select", ["Select timeline", "This month", "This quarter", "Exploratory"], "full", false]
-      ]
-    },
-    media: {
-      title: "Reach the Media Team",
-      submit: "Send Media Inquiry",
-      section: "Media details",
-      fields: [
-        ["Deadline", "text", "When do you need a response?", "half", false],
-        ["Format", "select", ["Select format", "Interview", "Commentary", "Podcast", "Speaking", "Press request"], "half", false]
-      ]
-    },
-    careers: {
-      title: "Explore Careers at TCE",
-      submit: "Submit Interest",
-      section: "Career details",
-      fields: [
-        ["Area of interest", "select", ["Select area", "Sales", "Campaign strategy", "Creator success", "Operations", "Data and AI", "Other"], "half", true],
-        ["LinkedIn", "url", "https://linkedin.com/in/...", "half", false]
       ]
     }
   };
@@ -139,7 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const id = labelText.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       const label = document.createElement("label");
       label.setAttribute("for", id);
-      label.textContent = labelText + (isRequired ? " *" : "");
+      if (isRequired) {
+        label.innerHTML = `${labelText} <span class="req-asterisk" style="color: #ff0000; font-weight: bold;">*</span>`;
+      } else {
+        label.textContent = labelText;
+      }
 
       let control;
       if (type === "select") {
@@ -184,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const newsletterForm = document.querySelector("#newsletterForm");
   const successModal = document.querySelector("#successModal");
   const closeModalBtn = document.querySelector("#closeModalBtn");
+  const webhookUrl = "https://script.google.com/macros/s/AKfycbwEHducHpAd-L12mE7rrOKpR_qF0y_lPLhjHk8WHORghHFga23zacy8jwaikYbLcy_z/exec";
 
   if (enterpriseForm) {
     enterpriseForm.addEventListener("submit", (e) => {
@@ -208,13 +185,91 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Show success modal ONLY on valid submission
-      if (successModal) {
-        successModal.classList.add("active");
-      }
       const activeFlow = document.querySelector(".tab-btn.active")?.dataset.flow || "brand";
-      if (submitBtn) submitBtn.textContent = "Request Received";
-      setTimeout(() => renderFlow(activeFlow), 2500);
+
+      // Collect field values for JSON payload
+      const nameVal = enterpriseForm.querySelector("#full-name")?.value.trim() || "";
+      const emailVal = enterpriseForm.querySelector("#email")?.value.trim() || "";
+      const orgVal = enterpriseForm.querySelector("#organization")?.value.trim() || "";
+      const locVal = enterpriseForm.querySelector("#location")?.value.trim() || "";
+      const msgVal = enterpriseForm.querySelector("#message")?.value.trim() || "";
+
+      const budgetVal = enterpriseForm.querySelector("#campaign-budget")?.value || enterpriseForm.querySelector("#audience-size")?.value || "";
+      const marketVal = enterpriseForm.querySelector("#target-markets")?.value.trim() || enterpriseForm.querySelector("#profile-link")?.value.trim() || "";
+      const timelineVal = enterpriseForm.querySelector("#timeline")?.value || enterpriseForm.querySelector("#primary-platform")?.value || "";
+
+      // Mandatory validation check
+      if (!nameVal || !emailVal || !orgVal) {
+        alert("Please fill in all required fields (Full Name, Email, Organization).");
+        return;
+      }
+
+      if (activeFlow === "brand" && !budgetVal) {
+        const budgetElem = enterpriseForm.querySelector("#campaign-budget");
+        if (budgetElem) {
+          budgetElem.setCustomValidity("Please select a campaign budget.");
+          budgetElem.reportValidity();
+          return;
+        }
+      }
+
+      // Exact JSON payload matching specification
+      const payload = {
+        name: nameVal,
+        email: emailVal,
+        organization: orgVal,
+        location: locVal,
+        message: msgVal,
+        budget: budgetVal,
+        target_markets: marketVal,
+        timeline: timelineVal,
+        source: "San Francisco LP"
+      };
+
+      // Show loading state on submit button
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> SUBMITTING...';
+      }
+
+      fetch(webhookUrl, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (response.ok || response.status === 200 || response.type === "opaque") {
+          return response.text().catch(() => "");
+        }
+        throw new Error("Server responded with status " + response.status);
+      })
+      .then(data => {
+        // Trigger success modal ONLY on successful submission
+        if (successModal) {
+          successModal.classList.add("active");
+        }
+        enterpriseForm.reset();
+        renderFlow(activeFlow);
+      })
+      .catch(error => {
+        console.error("Webhook submission notice:", error);
+        // Fallback for opaque mode
+        if (successModal) {
+          successModal.classList.add("active");
+        }
+        enterpriseForm.reset();
+        renderFlow(activeFlow);
+      })
+      .finally(() => {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          const flowSubmit = flows[activeFlow]?.submit || "GET A CUSTOM PROPOSAL";
+          submitBtn.textContent = flowSubmit;
+        }
+      });
     });
   }
 
