@@ -51,8 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 3. Enterprise Contact Form Flows
   const baseFields = [
-    ["Full name", "text", "Jane Smith", "half", true],
+    ["Full Name", "text", "Jane Smith", "half", true],
     ["Email", "email", "jane@company.com", "half", true],
+    ["Phone Number", "tel", "+1 (555) 000-0000", "half", true],
     ["Organization", "text", "Company, publication, or creator name", "half", true],
     ["Location", "text", "City, country", "half", false],
     ["Message", "textarea", "Briefly tell us what you need.", "full", false]
@@ -64,8 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
       submit: "GET A CUSTOM PROPOSAL",
       section: "CAMPAIGN DETAILS",
       fields: [
-        ["Campaign budget", "select", ["Select budget", "$10k-$25k", "$25k-$50k", "$50k-$100k", "$100k+"], "half", true],
-        ["Target markets", "text", "US, UAE, UK, India...", "half", false],
+        ["Campaign Budget", "select", ["Select budget", "$10k-$25k", "$25k-$50k", "$50k-$100k", "$100k+"], "half", true],
+        ["Target Markets", "text", "US, UAE, UK, India...", "half", false],
         ["Timeline", "select", ["Select timeline", "Immediate (1-2 weeks)", "1 Month", "2-3 Months", "Flexible / Planning"], "full", false]
       ]
     },
@@ -74,9 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
       submit: "SUBMIT CREATOR PROFILE",
       section: "CREATOR DETAILS",
       fields: [
-        ["Primary platform", "select", ["Select platform", "TikTok", "Instagram", "YouTube", "LinkedIn", "Other"], "half", true],
-        ["Profile link", "url", "https://instagram.com/...", "half", true],
-        ["Audience size", "select", ["Select audience size", "10k-50k", "50k-250k", "250k-1M", "1M+"], "full", false]
+        ["Primary Platform", "select", ["Select platform", "TikTok", "Instagram", "YouTube", "LinkedIn", "Other"], "half", true],
+        ["Profile Link", "url", "https://instagram.com/...", "half", true],
+        ["Audience Size", "select", ["Select audience size", "10k-50k", "50k-250k", "250k-1M", "1M+"], "full", false]
       ]
     }
   };
@@ -133,6 +134,15 @@ document.addEventListener('DOMContentLoaded', () => {
         control = document.createElement("input");
         control.type = type;
         control.placeholder = placeholder;
+        if (type === "tel") {
+          control.autocomplete = "tel";
+        } else if (type === "email") {
+          control.autocomplete = "email";
+        } else if (id === "full-name") {
+          control.autocomplete = "name";
+        } else if (id === "organization") {
+          control.autocomplete = "organization";
+        }
       }
 
       control.id = id;
@@ -190,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Collect field values for JSON payload
       const nameVal = enterpriseForm.querySelector("#full-name")?.value.trim() || "";
       const emailVal = enterpriseForm.querySelector("#email")?.value.trim() || "";
+      const phoneVal = enterpriseForm.querySelector("#phone-number")?.value.trim() || "";
       const orgVal = enterpriseForm.querySelector("#organization")?.value.trim() || "";
       const locVal = enterpriseForm.querySelector("#location")?.value.trim() || "";
       const msgVal = enterpriseForm.querySelector("#message")?.value.trim() || "";
@@ -199,8 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const timelineVal = enterpriseForm.querySelector("#timeline")?.value || enterpriseForm.querySelector("#primary-platform")?.value || "";
 
       // Mandatory validation check
-      if (!nameVal || !emailVal || !orgVal) {
-        alert("Please fill in all required fields (Full Name, Email, Organization).");
+      if (!nameVal || !emailVal || !phoneVal || !orgVal) {
+        alert("Please fill in all required fields (Full Name, Email, Phone Number, Organization).");
         return;
       }
 
@@ -213,10 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Exact JSON payload matching specification
+      // Exact JSON payload matching specification with phone key
       const payload = {
         name: nameVal,
         email: emailVal,
+        phone: phoneVal,
         organization: orgVal,
         location: locVal,
         message: msgVal,
