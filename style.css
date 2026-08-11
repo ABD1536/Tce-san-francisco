@@ -1645,10 +1645,29 @@ nav { flex: 1; }
   .wrap { width: 100%; padding: 0 20px; }
 
   /* Pill nav — floating fixed positioning & sizing for mobile */
-  .site-header { top: 12px; }
-  .nav-pill-wrap { width: calc(100% - 24px); padding: 0; }
-  .nav-pill { height: 50px; padding: 4px 14px; border-radius: 60px; }
-  .brand-logo-img { height: 25px; max-width: 140px; }
+  .site-header {
+    top: 12px;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+  }
+  .nav-pill-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .nav-pill {
+    height: 52px;
+    padding: 4px 12px 4px 16px;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .brand-logo-img { height: 24px; max-width: 130px; }
   .nav-mobile-btn { display: flex; }
 
   /* Hero — generous top clearance so floating pill header never covers "TCE" headline */
@@ -1674,8 +1693,23 @@ nav { flex: 1; }
   .logos-grid   { grid-template-columns: repeat(2,1fr); }
 
   /* Footer */
-  .ft-nl-row   { flex-direction: column; align-items: flex-start; }
-  .ft-nl-form  { min-width: 0; width: 100%; }
+  .ft-nl-row   { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .ft-nl-form  {
+    flex-direction: column !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+  .ft-nl-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .ft-nl-btn {
+    width: 100% !important;
+    padding: 12px 20px !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
   .ft-stats    { grid-template-columns: repeat(2,1fr); }
   .ft-cols     { grid-template-columns: 1fr !important; gap: 28px !important; text-align: left !important; }
   .ft-cols > div { width: 100% !important; }
