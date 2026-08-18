@@ -1895,19 +1895,27 @@ nav { flex: 1; }
 }
 
 .inf-slider-container {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 16px;
+  cursor: grab;
   width: 100%;
-  overflow: visible;
+}
+.inf-slider-container::-webkit-scrollbar {
+  display: none;
 }
 .inf-slider-track {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 24px;
-  width: 100%;
+  width: max-content;
 }
 
 .inf-card {
-  width: 100%;
+  width: 320px;
   height: 440px;
+  flex-shrink: 0;
   border-radius: 20px;
   overflow: hidden;
   position: relative;
@@ -1987,23 +1995,10 @@ nav { flex: 1; }
   letter-spacing: 0.02em;
 }
 
-@media (max-width: 1024px) {
-  .inf-slider-track {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
+@media (max-width: 768px) {
   .inf-card {
+    width: 270px;
     height: 380px;
-  }
-}
-
-@media (max-width: 640px) {
-  .inf-slider-track {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-  .inf-card {
-    height: 360px;
   }
 }
 
